@@ -14,11 +14,11 @@ const LOG_SCREEN = false;
 
 try
 {
-    var V86 = require(`../../build/${TEST_RELEASE_BUILD ? "libv86" : "libv86-debug"}.js`).V86;
+    var V86 = require(`../../engine/${TEST_RELEASE_BUILD ? "libv86" : "libv86-debug"}.js`).V86;
 }
 catch(e)
 {
-    console.error("Failed to import build/libv86-debug.js. Run `make build/libv86-debug.js first.");
+    console.error("Failed to import engine/libv86-debug.js. Run `make engine/libv86-debug.js first.");
     process.exit(1);
 }
 
@@ -314,8 +314,8 @@ if(cluster.isMaster)
             name: "Linux with bzImage from filesystem",
             bzimage_initrd_from_filesystem: true,
             filesystem: {
-                basefs: root_path + "/build/integration-test-fs/fs.json",
-                baseurl: root_path + "/build/integration-test-fs/flat/",
+                basefs: root_path + "/engine/integration-test-fs/fs.json",
+                baseurl: root_path + "/engine/integration-test-fs/flat/",
             },
             cmdline: "auto",
             timeout: 200,

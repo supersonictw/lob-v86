@@ -26,7 +26,7 @@ jobs:
           rustup component add rustfmt
 
       - name: Build v86
-        run: make build/libv86.js build/v86.wasm build/v86-fallback.wasm
+        run: make engine/libv86.js engine/v86.wasm engine/v86-fallback.wasm
 
       - name: Release to GitHub
         uses: marvinpinto/action-automatic-releases@latest
@@ -35,6 +35,6 @@ jobs:
           automatic_release_tag: latest
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           files: |
-            build/*.js
-            build/*.js.map
-            build/*.wasm
+            engine/*.js
+            engine/*.js.map
+            engine/*.wasm

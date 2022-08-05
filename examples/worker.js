@@ -1,7 +1,7 @@
-importScripts("../build/libv86.js");
+importScripts("../engine/libv86.js");
 
 var emulator = new V86Starter({
-    wasm_path: "../build/v86.wasm",
+    wasm_path: "../engine/v86.wasm",
     memory_size: 32 * 1024 * 1024,
     vga_memory_size: 2 * 1024 * 1024,
     bios: {

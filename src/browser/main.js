@@ -108,7 +108,7 @@
         }
 
         const script = document.createElement("script");
-        script.src = "build/xterm.js";
+        script.src = "engine/xterm.js";
         script.async = true;
         document.body.appendChild(script);
 
@@ -890,7 +890,7 @@
         {
             const link = document.createElement("link");
             link.rel = "prefetch";
-            link.href = "build/v86.wasm";
+            link.href = "engine/v86.wasm";
             document.head.appendChild(link);
         }
 

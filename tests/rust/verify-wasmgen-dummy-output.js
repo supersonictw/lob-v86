@@ -7,7 +7,7 @@ const assert = require("assert").strict;
 const fs = require("fs");
 const path = require("path");
 
-const DUMMY_MODULE_PATH = path.resolve(__dirname, "../../build/dummy_output.wasm");
+const DUMMY_MODULE_PATH = path.resolve(__dirname, "../../engine/dummy_output.wasm");
 const dummy_module = fs.readFileSync(DUMMY_MODULE_PATH);
 
 const wm = new WebAssembly.Module(dummy_module);

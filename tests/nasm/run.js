@@ -26,7 +26,7 @@ const TEST_NAME = process.env.TEST_NAME;
 const SINGLE_TEST_TIMEOUT = 10000;
 const TEST_RELEASE_BUILD = +process.env.TEST_RELEASE_BUILD;
 
-const TEST_DIR = __dirname + "/build/";
+const TEST_DIR = __dirname + "/engine/";
 const DONE_MSG = "DONE";
 const TERMINATE_MSG = "DONE";
 
@@ -48,12 +48,12 @@ const FPU_STATUS_MASK = 0xFFFF & ~(1 << 9 | 1 << 5 | 1 << 3); // bits that are n
 const FP_COMPARISON_SIGNIFICANT_DIGITS = 7;
 
 try {
-    var V86 = require(`../../build/${TEST_RELEASE_BUILD ? "libv86" : "libv86-debug"}.js`).V86;
+    var V86 = require(`../../engine/${TEST_RELEASE_BUILD ? "libv86" : "libv86-debug"}.js`).V86;
 }
 catch(e) {
     console.error(e);
-    console.error("Failed to import build/libv86-debug.js. Run " +
-                  "`make build/libv86-debug.js` first.");
+    console.error("Failed to import engine/libv86-debug.js. Run " +
+                  "`make engine/libv86-debug.js` first.");
     process.exit(1);
 }
 

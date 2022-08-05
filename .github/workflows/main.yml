@@ -48,7 +48,7 @@ jobs:
     - uses: actions/cache@v2
       id: cache-nasmtests
       with:
-        path: tests/nasm/build/
+        path: tests/nasm/engine/
         key: ${{ runner.os }}-nasmtests
     - name: build namsmtests
       if: steps.cache-nasmtests.outputs.cache-hit != 'true'

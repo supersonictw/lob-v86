@@ -19,10 +19,10 @@ endif
 
 WASM_OPT ?= false
 
-default: build/v86-debug.wasm
-all: build/v86_all.js build/libv86.js build/v86.wasm
-all-debug: build/libv86-debug.js build/v86-debug.wasm
-browser: build/v86_all.js
+default: engine/v86-debug.wasm
+all: engine/v86_all.js engine/libv86.js engine/v86.wasm
+all-debug: engine/libv86-debug.js engine/v86-debug.wasm
+browser: engine/v86_all.js
 
 # Used for nodejs builds and in order to profile code.
 # `debug` gives identifiers a readable name, make sure it doesn't have any side effects.
@@ -71,8 +71,8 @@ CARGO_FLAGS_SAFE=\
 		-- \
 		-C linker=tools/rust-lld-wrapper \
 		-C link-args="--import-table --global-base=4096 $(STRIP_DEBUG_FLAG)" \
-		-C link-args="build/softfloat.o" \
-		-C link-args="build/zstddeclib.o" \
+		-C link-args="engine/softfloat.o" \
+		-C link-args="engine/zstddeclib.o" \
 		--verbose
 
 CARGO_FLAGS=$(CARGO_FLAGS_SAFE) -C target-feature=+bulk-memory
@@ -97,11 +97,11 @@ CORE_FILES:=$(addprefix src/,$(CORE_FILES))
 LIB_FILES:=$(addprefix lib/,$(LIB_FILES))
 BROWSER_FILES:=$(addprefix src/browser/,$(BROWSER_FILES))
 
-build/v86_all.js: $(CLOSURE) src/*.js src/browser/*.js lib/*.js
+engine/v86_all.js: $(CLOSURE) src/*.js src/browser/*.js lib/*.js
 	mkdir -p build
-	-ls -lh build/v86_all.js
+	-ls -lh engine/v86_all.js
 	java -jar $(CLOSURE) \
-		--js_output_file build/v86_all.js\
+		--js_output_file engine/v86_all.js\
 		--define=DEBUG=false\
 		$(CLOSURE_SOURCE_MAP)\
 		$(CLOSURE_FLAGS)\
@@ -110,12 +110,12 @@ build/v86_all.js: $(CLOSURE) src/*.js src/browser/*.js lib/*.js
 		--js $(LIB_FILES)\
 		--js $(BROWSER_FILES)\
 		--js src/browser/main.js
-	ls -lh build/v86_all.js
+	ls -lh engine/v86_all.js
 
-build/v86_all_debug.js: $(CLOSURE) src/*.js src/browser/*.js lib/*.js
+engine/v86_all_debug.js: $(CLOSURE) src/*.js src/browser/*.js lib/*.js
 	mkdir -p build
 	java -jar $(CLOSURE) \
-		--js_output_file build/v86_all_debug.js\
+		--js_output_file engine/v86_all_debug.js\
 		--define=DEBUG=true\
 		$(CLOSURE_SOURCE_MAP)\
 		$(CLOSURE_FLAGS)\
@@ -125,11 +125,11 @@ build/v86_all_debug.js: $(CLOSURE) src/*.js src/browser/*.js lib/*.js
 		--js $(BROWSER_FILES)\
 		--js src/browser/main.js
 
-build/libv86.js: $(CLOSURE) src/*.js lib/*.js src/browser/*.js
+engine/libv86.js: $(CLOSURE) src/*.js lib/*.js src/browser/*.js
 	mkdir -p build
-	-ls -lh build/libv86.js
+	-ls -lh engine/libv86.js
 	java -jar $(CLOSURE) \
-		--js_output_file build/libv86.js\
+		--js_output_file engine/libv86.js\
 		--define=DEBUG=false\
 		$(CLOSURE_FLAGS)\
 		--compilation_level SIMPLE\
@@ -138,12 +138,12 @@ build/libv86.js: $(CLOSURE) src/*.js lib/*.js src/browser/*.js
 		--js $(CORE_FILES)\
 		--js $(BROWSER_FILES)\
 		--js $(LIB_FILES)
-	ls -lh build/libv86.js
+	ls -lh engine/libv86.js
 
-build/libv86-debug.js: $(CLOSURE) src/*.js lib/*.js src/browser/*.js
+engine/libv86-debug.js: $(CLOSURE) src/*.js lib/*.js src/browser/*.js
 	mkdir -p build
 	java -jar $(CLOSURE) \
-		--js_output_file build/libv86-debug.js\
+		--js_output_file engine/libv86-debug.js\
 		--define=DEBUG=true\
 		$(CLOSURE_FLAGS)\
 		$(CLOSURE_READABLE)\
@@ -155,76 +155,76 @@ build/libv86-debug.js: $(CLOSURE) src/*.js lib/*.js src/browser/*.js
 		--js $(LIB_FILES)
 
 src/rust/gen/jit.rs: $(JIT_DEPENDENCIES)
-	./gen/generate_jit.js --output-dir build/ --table jit
+	./gen/generate_jit.js --output-dir engine/ --table jit
 src/rust/gen/jit0f.rs: $(JIT_DEPENDENCIES)
-	./gen/generate_jit.js --output-dir build/ --table jit0f
+	./gen/generate_jit.js --output-dir engine/ --table jit0f
 
 src/rust/gen/interpreter.rs: $(INTERPRETER_DEPENDENCIES)
-	./gen/generate_interpreter.js --output-dir build/ --table interpreter
+	./gen/generate_interpreter.js --output-dir engine/ --table interpreter
 src/rust/gen/interpreter0f.rs: $(INTERPRETER_DEPENDENCIES)
-	./gen/generate_interpreter.js --output-dir build/ --table interpreter0f
+	./gen/generate_interpreter.js --output-dir engine/ --table interpreter0f
 
 src/rust/gen/analyzer.rs: $(ANALYZER_DEPENDENCIES)
-	./gen/generate_analyzer.js --output-dir build/ --table analyzer
+	./gen/generate_analyzer.js --output-dir engine/ --table analyzer
 src/rust/gen/analyzer0f.rs: $(ANALYZER_DEPENDENCIES)
-	./gen/generate_analyzer.js --output-dir build/ --table analyzer0f
+	./gen/generate_analyzer.js --output-dir engine/ --table analyzer0f
 
-build/v86.wasm: $(RUST_FILES) build/softfloat.o build/zstddeclib.o Cargo.toml
-	mkdir -p build/
-	-BLOCK_SIZE=K ls -l build/v86.wasm
+engine/v86.wasm: $(RUST_FILES) engine/softfloat.o engine/zstddeclib.o Cargo.toml
+	mkdir -p engine/
+	-BLOCK_SIZE=K ls -l engine/v86.wasm
 	cargo rustc --release $(CARGO_FLAGS)
-	mv build/wasm32-unknown-unknown/release/v86.wasm build/v86.wasm
-	-$(WASM_OPT) && wasm-opt -O2 --strip-debug build/v86.wasm -o build/v86.wasm
-	BLOCK_SIZE=K ls -l build/v86.wasm
+	mv build/wasm32-unknown-unknown/release/v86.wasm engine/v86.wasm
+	-$(WASM_OPT) && wasm-opt -O2 --strip-debug engine/v86.wasm -o engine/v86.wasm
+	BLOCK_SIZE=K ls -l engine/v86.wasm
 
-build/v86-debug.wasm: $(RUST_FILES) build/softfloat.o build/zstddeclib.o Cargo.toml
-	mkdir -p build/
-	-BLOCK_SIZE=K ls -l build/v86-debug.wasm
+engine/v86-debug.wasm: $(RUST_FILES) engine/softfloat.o engine/zstddeclib.o Cargo.toml
+	mkdir -p engine/
+	-BLOCK_SIZE=K ls -l engine/v86-debug.wasm
 	cargo rustc $(CARGO_FLAGS)
-	mv build/wasm32-unknown-unknown/debug/v86.wasm build/v86-debug.wasm
-	BLOCK_SIZE=K ls -l build/v86-debug.wasm
+	mv build/wasm32-unknown-unknown/debug/v86.wasm engine/v86-debug.wasm
+	BLOCK_SIZE=K ls -l engine/v86-debug.wasm
 
-build/v86-fallback.wasm: $(RUST_FILES) build/softfloat.o build/zstddeclib.o Cargo.toml
-	mkdir -p build/
+engine/v86-fallback.wasm: $(RUST_FILES) engine/softfloat.o engine/zstddeclib.o Cargo.toml
+	mkdir -p engine/
 	cargo rustc --release $(CARGO_FLAGS_SAFE)
-	mv build/wasm32-unknown-unknown/release/v86.wasm build/v86-fallback.wasm || true
+	mv build/wasm32-unknown-unknown/release/v86.wasm engine/v86-fallback.wasm || true
 
-debug-with-profiler: $(RUST_FILES) build/softfloat.o build/zstddeclib.o Cargo.toml
-	mkdir -p build/
+debug-with-profiler: $(RUST_FILES) engine/softfloat.o engine/zstddeclib.o Cargo.toml
+	mkdir -p engine/
 	cargo rustc --features profiler $(CARGO_FLAGS)
-	mv build/wasm32-unknown-unknown/debug/v86.wasm build/v86-debug.wasm || true
+	mv build/wasm32-unknown-unknown/debug/v86.wasm engine/v86-debug.wasm || true
 
-with-profiler: $(RUST_FILES) build/softfloat.o build/zstddeclib.o Cargo.toml
-	mkdir -p build/
+with-profiler: $(RUST_FILES) engine/softfloat.o engine/zstddeclib.o Cargo.toml
+	mkdir -p engine/
 	cargo rustc --release --features profiler $(CARGO_FLAGS)
-	mv build/wasm32-unknown-unknown/release/v86.wasm build/v86.wasm || true
+	mv build/wasm32-unknown-unknown/release/v86.wasm engine/v86.wasm || true
 
-build/softfloat.o: lib/softfloat/softfloat.c
+engine/softfloat.o: lib/softfloat/softfloat.c
 	mkdir -p build
 	clang -c -Wall \
 	    --target=wasm32 -O3 -flto -nostdlib -fvisibility=hidden -ffunction-sections -fdata-sections \
 	    -DSOFTFLOAT_FAST_INT64 -DINLINE_LEVEL=5 -DSOFTFLOAT_FAST_DIV32TO16 -DSOFTFLOAT_FAST_DIV64TO32 \
-	    -o build/softfloat.o \
+	    -o engine/softfloat.o \
 	    lib/softfloat/softfloat.c
 
-build/zstddeclib.o: lib/zstd/zstddeclib.c
+engine/zstddeclib.o: lib/zstd/zstddeclib.c
 	mkdir -p build
 	clang -c -Wall \
 	    --target=wasm32 -O3 -flto -nostdlib -fvisibility=hidden -ffunction-sections -fdata-sections \
 	    -DZSTDLIB_VISIBILITY="" \
-	    -o build/zstddeclib.o \
+	    -o engine/zstddeclib.o \
 	    lib/zstd/zstddeclib.c
 
 clean:
-	-rm build/libv86.js
-	-rm build/libv86-debug.js
-	-rm build/v86_all.js
-	-rm build/v86.wasm
-	-rm build/v86-debug.wasm
+	-rm engine/libv86.js
+	-rm engine/libv86-debug.js
+	-rm engine/v86_all.js
+	-rm engine/v86.wasm
+	-rm engine/v86-debug.wasm
 	-rm $(INSTRUCTION_TABLES)
-	-rm build/*.map
-	-rm build/*.wast
-	-rm build/*.o
+	-rm engine/*.map
+	-rm engine/*.wast
+	-rm engine/*.o
 	$(MAKE) -C $(NASM_TEST_DIR) clean
 
 run:
@@ -245,19 +245,19 @@ $(CLOSURE):
 	# don't upgrade until https://github.com/google/closure-compiler/issues/3972 is fixed
 	wget -nv -O $(CLOSURE) https://repo1.maven.org/maven2/com/google/javascript/closure-compiler/v20210601/closure-compiler-v20210601.jar
 
-build/integration-test-fs/fs.json:
-	mkdir -p build/integration-test-fs/flat
-	cp images/buildroot-bzimage.bin build/integration-test-fs/bzImage
-	touch build/integration-test-fs/initrd
-	cd build/integration-test-fs && tar cfv fs.tar bzImage initrd
-	./tools/fs2json.py build/integration-test-fs/fs.tar --out build/integration-test-fs/fs.json
-	./tools/copy-to-sha256.py build/integration-test-fs/fs.tar build/integration-test-fs/flat
-	rm build/integration-test-fs/fs.tar build/integration-test-fs/bzImage build/integration-test-fs/initrd
+engine/integration-test-fs/fs.json:
+	mkdir -p engine/integration-test-fs/flat
+	cp images/buildroot-bzimage.bin engine/integration-test-fs/bzImage
+	touch engine/integration-test-fs/initrd
+	cd engine/integration-test-fs && tar cfv fs.tar bzImage initrd
+	./tools/fs2json.py engine/integration-test-fs/fs.tar --out engine/integration-test-fs/fs.json
+	./tools/copy-to-sha256.py engine/integration-test-fs/fs.tar engine/integration-test-fs/flat
+	rm engine/integration-test-fs/fs.tar engine/integration-test-fs/bzImage engine/integration-test-fs/initrd
 
-tests: all-debug build/integration-test-fs/fs.json
+tests: all-debug engine/integration-test-fs/fs.json
 	./tests/full/run.js
 
-tests-release: build/libv86.js build/v86.wasm build/integration-test-fs/fs.json
+tests-release: engine/libv86.js engine/v86.wasm engine/integration-test-fs/fs.json
 	TEST_RELEASE_BUILD=1 ./tests/full/run.js
 
 nasmtests: all-debug
@@ -276,25 +276,25 @@ jitpagingtests: all-debug
 
 qemutests: all-debug
 	$(MAKE) -C tests/qemu test-i386
-	./tests/qemu/run.js > build/qemu-test-result
-	./tests/qemu/run-qemu.js > build/qemu-test-reference
-	diff build/qemu-test-result build/qemu-test-reference
+	./tests/qemu/run.js > engine/qemu-test-result
+	./tests/qemu/run-qemu.js > engine/qemu-test-reference
+	diff engine/qemu-test-result engine/qemu-test-reference
 
-qemutests-release: build/libv86.js build/v86.wasm
+qemutests-release: engine/libv86.js engine/v86.wasm
 	$(MAKE) -C tests/qemu test-i386
-	TEST_RELEASE_BUILD=1 time ./tests/qemu/run.js > build/qemu-test-result
-	./tests/qemu/run-qemu.js > build/qemu-test-reference
-	diff build/qemu-test-result build/qemu-test-reference
+	TEST_RELEASE_BUILD=1 time ./tests/qemu/run.js > engine/qemu-test-result
+	./tests/qemu/run-qemu.js > engine/qemu-test-reference
+	diff engine/qemu-test-result engine/qemu-test-reference
 
 kvm-unit-test: all-debug
 	(cd tests/kvm-unit-tests && ./configure && make x86/realmode.flat)
 	tests/kvm-unit-tests/run.js tests/kvm-unit-tests/x86/realmode.flat
 
-kvm-unit-test-release: build/libv86.js build/v86.wasm
+kvm-unit-test-release: engine/libv86.js engine/v86.wasm
 	(cd tests/kvm-unit-tests && ./configure && make x86/realmode.flat)
 	TEST_RELEASE_BUILD=1 tests/kvm-unit-tests/run.js tests/kvm-unit-tests/x86/realmode.flat
 
-expect-tests: all-debug build/libwabt.js
+expect-tests: all-debug engine/libwabt.js
 	make -C tests/expect/tests
 	./tests/expect/run.js
 
@@ -323,17 +323,17 @@ jshint:
 rustfmt: $(RUST_FILES)
 	cargo fmt --all -- --check
 
-build/capstone-x86.min.js:
+engine/capstone-x86.min.js:
 	mkdir -p build
 	wget -nv -P build https://github.com/AlexAltea/capstone.js/releases/download/v3.0.5-rc1/capstone-x86.min.js
 
-build/libwabt.js:
+engine/libwabt.js:
 	mkdir -p build
 	wget -nv -P build https://github.com/WebAssembly/wabt/archive/1.0.6.zip
-	unzip -j -d build/ build/1.0.6.zip wabt-1.0.6/demo/libwabt.js
-	rm build/1.0.6.zip
+	unzip -j -d engine/ engine/1.0.6.zip wabt-1.0.6/demo/libwabt.js
+	rm engine/1.0.6.zip
 
-build/xterm.js:
-	curl https://cdn.jsdelivr.net/npm/xterm@4.9.0/lib/xterm.js > build/xterm.js
-	curl https://cdn.jsdelivr.net/npm/xterm@4.9.0/lib/xterm.js.map > build/xterm.js.map
-	curl https://cdn.jsdelivr.net/npm/xterm@4.9.0/css/xterm.css > build/xterm.css
+engine/xterm.js:
+	curl https://cdn.jsdelivr.net/npm/xterm@4.9.0/lib/xterm.js > engine/xterm.js
+	curl https://cdn.jsdelivr.net/npm/xterm@4.9.0/lib/xterm.js.map > engine/xterm.js.map
+	curl https://cdn.jsdelivr.net/npm/xterm@4.9.0/css/xterm.css > engine/xterm.css

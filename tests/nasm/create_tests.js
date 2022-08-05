@@ -13,7 +13,7 @@ generate_tests();
 
 function generate_tests()
 {
-    const build_folder = __dirname + "/build/";
+    const build_folder = __dirname + "/engine/";
 
     try
     {

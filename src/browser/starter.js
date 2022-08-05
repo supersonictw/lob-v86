@@ -178,8 +178,8 @@ function V86Starter(options)
                 }
                 else
                 {
-                    v86_bin = "build/" + v86_bin;
-                    v86_bin_fallback = "build/" + v86_bin_fallback;
+                    v86_bin = "engine/" + v86_bin;
+                    v86_bin_fallback = "engine/" + v86_bin_fallback;
                 }
 
                 v86util.load_file(v86_bin, {

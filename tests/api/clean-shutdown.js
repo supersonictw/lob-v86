@@ -7,7 +7,7 @@
 const TEST_RELEASE_BUILD = +process.env.TEST_RELEASE_BUILD;
 
 const fs = require("fs");
-var V86 = require(`../../build/${TEST_RELEASE_BUILD ? "libv86" : "libv86-debug"}.js`).V86;
+var V86 = require(`../../engine/${TEST_RELEASE_BUILD ? "libv86" : "libv86-debug"}.js`).V86;
 
 process.on("unhandledRejection", exn => { throw exn; });
 

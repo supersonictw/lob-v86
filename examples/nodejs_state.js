@@ -2,7 +2,7 @@
 "use strict";
 
 var fs = require("fs");
-var V86Starter = require("../build/libv86.js").V86Starter;
+var V86Starter = require("../engine/libv86.js").V86Starter;
 
 function readfile(path)
 {

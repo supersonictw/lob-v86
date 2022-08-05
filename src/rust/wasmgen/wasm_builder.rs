@@ -1023,7 +1023,7 @@ mod tests {
         let op_len = m.get_output_len();
         dbg_log!("op_ptr: {:?}, op_len: {:?}", op_ptr, op_len);
 
-        let mut f = File::create("build/dummy_output.wasm").expect("creating dummy_output.wasm");
+        let mut f = File::create("engine/dummy_output.wasm").expect("creating dummy_output.wasm");
         f.write_all(&m.output).expect("write dummy_output.wasm");
     }
 }

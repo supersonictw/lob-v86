@@ -88,7 +88,7 @@ How to build, run and embed?
 
 - Building is only necessary for releases, open debug.html and everything should load out of the box
 - If you want a compressed and fast (i.e. with debug code removed) version, you
-  need Closure Compiler. Download it as shown below and run `make build/v86_all.js`.
+  need Closure Compiler. Download it as shown below and run `make engine/v86_all.js`.
 - ROM and disk images are loaded via XHR, so if you want to try out `index.html`
   locally, make sure to serve it from a local webserver. You can use `make run`
   to serve the files using Python's SimpleHTTPServer.
@@ -112,7 +112,7 @@ wget -P closure-compiler https://dl.google.com/closure-compiler/compiler-latest.
 unzip -d closure-compiler closure-compiler/compiler-latest.zip *.jar
 
 # build the library
-make build/libv86.js
+make engine/libv86.js
 
 # run the tests
 ./tests/full/run.js

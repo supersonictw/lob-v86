@@ -8,15 +8,15 @@ const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
 
-const libwabt = require("../../build/libwabt.js")();
+const libwabt = require("../../engine/libwabt.js")();
 
 try {
-    var V86 = require(`../../build/${TEST_RELEASE_BUILD ? "libv86" : "libv86-debug"}.js`).V86;
+    var V86 = require(`../../engine/${TEST_RELEASE_BUILD ? "libv86" : "libv86-debug"}.js`).V86;
 }
 catch(e) {
     console.error(e);
-    console.error("Failed to import build/libv86-debug.js. Run " +
-                  "`make build/libv86-debug.js` first.");
+    console.error("Failed to import engine/libv86-debug.js. Run " +
+                  "`make engine/libv86-debug.js` first.");
     process.exit(1);
 }
 

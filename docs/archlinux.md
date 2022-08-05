@@ -384,7 +384,7 @@ Generated artifacts are now available for serving from `output`.
 
 Now that we have everything we need to host a server that serves an Archlinux environment over the network.
 
-Create a checkout of v86 and run `make build/libv86.js`.
+Create a checkout of v86 and run `make engine/libv86.js`.
 We can then edit `examples/arch.html`, we have two options:
 
 1. Boot Arch Linux from the 9p filesystem (generated .bin artifacts at `/output/images/arch`):

@@ -5,7 +5,7 @@ Run the following to run this test:
 ```sh
 ./configure
 make
-make -C ../../build/libv86.js
+make -C ../../engine/libv86.js
 ./run.js x86/realmode.flat
 ./run.js x86/setjmp.flat
 ./run.js x86/cmpxchg8b.flat
