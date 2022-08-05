@@ -1,7 +1,9 @@
 name: main
+
 on:
   push:
   pull_request:
+
 jobs:
   jshint:
     runs-on: ubuntu-22.04
